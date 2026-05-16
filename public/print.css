@@ -1,0 +1,69 @@
+@media print {
+  #nav,
+  #filename,
+  .sidebar,
+  .sidebar-backdrop,
+  .content-header,
+  .filter-controls,
+  .search-header,
+  .note-meta,
+  .note-tags,
+  .search-result-tags,
+  .tag-pill,
+  .toc-details,
+  .toc-summary,
+  .toc,
+  .toc-list,
+  .toc-item,
+  .toc-link,
+  .backlinks-section {
+    display: none !important;
+  }
+
+  body {
+    background: #fff !important;
+  }
+
+  .container,
+  .content {
+    border: none !important;
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+    max-width: 100% !important;
+    box-shadow: none !important;
+    background: #fff !important;
+    color: #000 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    break-inside: auto !important;
+    page-break-inside: auto !important;
+  }
+
+  .markdown-body {
+    border: none !important;
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+    max-width: 100% !important;
+    box-shadow: none !important;
+    background: #fff !important;
+    color: #000 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    break-inside: auto !important;
+    page-break-inside: auto !important;
+  }
+
+  h1,
+  h2,
+  h3,
+  img,
+  pre,
+  table {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}

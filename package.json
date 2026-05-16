@@ -1,0 +1,60 @@
+{
+  "name": "local-notes",
+  "version": "1.0.0",
+  "description": "Markdown notes server — preview, search, and manage your markdown notes locally or deploy to Vercel",
+  "type": "module",
+  "bin": {
+    "local-notes": "./dist/bin/local-notes.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./mcp": {
+      "types": "./dist/mcp/index.d.ts",
+      "import": "./dist/mcp/index.js",
+      "default": "./dist/mcp/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "public",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsx watch bin/local-notes.ts --watch",
+    "start": "node dist/bin/local-notes.js",
+    "typecheck": "tsc --noEmit",
+    "test": "node --import tsx --test",
+    "search": "node --import tsx scripts/search-notes.ts",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "@picocss/pico": "^2.0.6",
+    "glob": "^10.3.10",
+    "markdown-it": "^14.1.1",
+    "markdown-it-abbr": "^2.0.0",
+    "markdown-it-anchor": "^9.2.0",
+    "markdown-it-attrs": "^4.3.1",
+    "markdown-it-container": "^4.0.0",
+    "markdown-it-deflist": "^3.0.0",
+    "markdown-it-emoji": "^3.0.0",
+    "markdown-it-footnote": "^4.0.0",
+    "markdown-it-mermaid-plugin": "^0.1.0",
+    "markdown-it-sub": "^2.0.0",
+    "markdown-it-sup": "^2.0.0",
+    "markdown-it-task-lists": "^2.1.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.3",
+    "chokidar": "^3.6.0",
+    "nodemon": "^3.0.2",
+    "sharp": "^0.34.5",
+    "tsx": "^4.19.4",
+    "tsup": "^8.4.0",
+    "typescript": "^5.8.3"
+  }
+}
