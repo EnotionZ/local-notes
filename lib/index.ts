@@ -40,3 +40,7 @@ export {
 // ── Search engine ──
 export { createSearchEngine, tokenizeQuery, scoreRecord, extractSnippet, MIN_SEARCH_QUERY_LENGTH } from "./search.js";
 export type { SearchRecord, SearchResult, SearchEngine } from "./search.js";
+
+// ── App (Vercel / serverless handler) ──
+export { createApp } from "../src/app.js";
+export type { AppDeps } from "../src/app.js";
