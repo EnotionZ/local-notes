@@ -24,7 +24,7 @@
     "README.md"
   ],
   "scripts": {
-    "build": "tsup",
+    "build": "tsup && cp node_modules/@picocss/pico/css/pico.min.css dist/_pico.css",
     "dev": "tsx watch bin/local-notes.ts --watch",
     "start": "node dist/bin/local-notes.js",
     "typecheck": "tsc --noEmit",

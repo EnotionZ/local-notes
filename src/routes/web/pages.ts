@@ -1,6 +1,7 @@
 import { readFileSync, statSync, existsSync } from "node:fs";
 import path from "node:path";
 import { createRequire } from "node:module";
+import { fileURLToPath } from "node:url";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import type { NotesManager } from "../../../lib/notes.js";
 import type { SearchEngine } from "../../../lib/search.js";
@@ -10,10 +11,15 @@ import { parseFrontmatter } from "../../../lib/frontmatter.js";
 import { encodePathSegments, stripMdExtension, escapeHtml, escapeRegex } from "../../../lib/path-utils.js";
 import { MIN_SEARCH_QUERY_LENGTH } from "../../../lib/search.js";
 
+// Cache Pico CSS at module load time.
+// Production (bundled): reads from dist/_pico.css (copied at build time).
+// Dev (tsx): falls back to require.resolve from node_modules.
 const _require = createRequire(import.meta.url);
-
-// Cache Pico CSS at module load time so the serverless file tracer includes it.
-const picoCSS = readFileSync(_require.resolve("@picocss/pico"), "utf8");
+const distPicoPath = path.join(path.dirname(fileURLToPath(import.meta.url)), "_pico.css");
+const picoCSS = readFileSync(
+  existsSync(distPicoPath) ? distPicoPath : _require.resolve("@picocss/pico"),
+  "utf8",
+);
 
 const STAR_TAG = "star";
 const SIDEBAR_FAVORITES_PATH = "__favorites__";
