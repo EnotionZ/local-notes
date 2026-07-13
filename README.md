@@ -61,33 +61,95 @@ npx local-notes ./path/to/notes
 
 ### Vercel
 
-The package exports `createApp` — a `(req, res)` handler compatible with Vercel serverless functions. To deploy your own notes server:
+The package exports `createApp` — a `(req, res)` handler compatible with Vercel serverless functions. The setup below doubles as a local dev server: when run directly (`node index.js`) it starts an HTTP server, and when bundled by Vercel it acts as a serverless handler.
 
-1. Install the package: `npm install local-notes`
-2. Create `api/index.ts` that imports and configures the app:
+1. Create a directory for your project and add a `package.json`:
 
-```ts
-import { createApp } from "local-notes";
-import { createNotesManager } from "local-notes";
-import { createSearchEngine } from "local-notes";
+```bash
+npm init -y
+```
+
+2. Install the package:
+
+```bash
+npm install github:EnotionZ/local-notes
+```
+
+3. Create `index.js`:
+
+```js
+import { createApp, createNotesManager, createSearchEngine } from "local-notes";
+import { createServer } from "node:http";
 import path from "node:path";
-import { existsSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 
-const notesDir = process.env.NOTES_DIR || path.resolve(process.cwd(), "Notes");
-const publicDir = path.resolve(process.cwd(), "public");
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+// Directory containing your markdown notes
+const notesDir = process.env.NOTES_DIR || path.resolve(__dirname, "docs");
+
+// The local-notes package root (contains public/ dir with CSS, JS, icons)
+const publicDir = path.resolve(__dirname, "node_modules", "local-notes");
 
 const notesManager = createNotesManager(notesDir);
 const searchEngine = createSearchEngine(notesManager);
 
-export default createApp({
+const app = createApp({
   notesManager,
   searchEngine,
   publicDir,
-  readmePath: undefined, // optional readme on the homepage
+  readmePath: undefined, // optional readme shown on homepage
 });
+
+// Start HTTP server when run directly; export for Vercel serverless
+const isMain = process.argv[1] === fileURLToPath(import.meta.url);
+if (isMain) {
+  const port = parseInt(process.env.PORT || "3007", 10);
+  createServer(app).listen(port, () => {
+    console.log(`Notes server running at http://localhost:${port}`);
+  });
+}
+
+export default app;
 ```
 
-3. Deploy with your notes directory:
+4. Create `vercel.json`:
+
+```json
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "index.js",
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": [
+          "node_modules/local-notes/public/**",
+          "node_modules/local-notes/dist/**",
+          "docs/**"
+        ]
+      }
+    }
+  ],
+  "routes": [
+    { "src": "/api/(.*)", "dest": "/index.js" },
+    { "src": "/public/(.*)", "dest": "/index.js" },
+    { "src": "/service-worker.js", "dest": "/index.js" },
+    { "handle": "filesystem" },
+    { "src": "/(.*)", "dest": "/index.js" }
+  ]
+}
+```
+
+5. Run locally:
+
+```bash
+node index.js
+# → http://localhost:3007
+```
+
+6. Deploy to Vercel:
+
 ```bash
 vercel --env NOTES_DIR=./docs
 ```
