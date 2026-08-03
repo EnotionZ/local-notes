@@ -187,8 +187,12 @@ function buildSidebarItems(files: string[], activePath = "", notesManager: Notes
 // Homepage helpers
 // ---------------------------------------------------------------------------
 
-function getFilesWithStats(files: string[], notesManager: NotesManager) {
-  const gitModifiedTimes = getGitModifiedTimes(notesManager.notesDir);
+function getFilesWithStats(
+  files: string[],
+  notesManager: NotesManager,
+  buildModifiedTimes?: ReadonlyMap<string, number>,
+) {
+  const gitModifiedTimes = buildModifiedTimes ?? getGitModifiedTimes(notesManager.notesDir);
   const items: { relPath: string; mtimeMs: number; isFavorite: boolean }[] = [];
   for (const relPath of files) {
     const absPath = notesManager.resolveNotesPath(relPath);
@@ -507,8 +511,13 @@ export interface PagesHandlers {
   buildSidebarItems: (files: string[], activePath?: string) => string;
 }
 
-export function createPages(deps: { notesManager: NotesManager; searchEngine: SearchEngine; readmePath?: string }): PagesHandlers {
-  const { notesManager, searchEngine } = deps;
+export function createPages(deps: {
+  notesManager: NotesManager;
+  searchEngine: SearchEngine;
+  readmePath?: string;
+  modifiedTimes?: ReadonlyMap<string, number>;
+}): PagesHandlers {
+  const { notesManager, searchEngine, modifiedTimes } = deps;
   const readmePath = deps.readmePath || "";
 
   function serveHomepage(res: ServerResponse, parsedUrl: URL): void {
@@ -540,7 +549,7 @@ export function createPages(deps: { notesManager: NotesManager; searchEngine: Se
     `;
 
     const files = notesManager.getMarkdownFilesCached();
-    const filesWithStats = getFilesWithStats(files, notesManager);
+    const filesWithStats = getFilesWithStats(files, notesManager, modifiedTimes);
     const requestedFilter = parsedUrl.searchParams.get("filter") || "";
     const filterMode = requestedFilter === "recent" || requestedFilter === "readme" ? requestedFilter : "favorites";
     const filteredDocsHtml =

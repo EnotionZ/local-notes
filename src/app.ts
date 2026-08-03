@@ -18,6 +18,8 @@ export interface AppDeps {
   readmePath?: string;
   /** Root directory for public/ static assets (CSS, JS, icons, service worker). */
   publicDir: string;
+  /** Optional build-time modified dates, keyed by note path relative to notesDir. */
+  modifiedTimes?: ReadonlyMap<string, number>;
 }
 
 export function createApp(deps: AppDeps) {
