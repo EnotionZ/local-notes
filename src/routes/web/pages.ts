@@ -10,6 +10,7 @@ import { renderMarkdown, extractHeadings } from "../../../lib/markdown.js";
 import { parseFrontmatter } from "../../../lib/frontmatter.js";
 import { encodePathSegments, stripMdExtension, escapeHtml, escapeRegex } from "../../../lib/path-utils.js";
 import { MIN_SEARCH_QUERY_LENGTH } from "../../../lib/search.js";
+import { getGitModifiedTimes } from "../../../lib/note-dates.js";
 
 // Cache Pico CSS at module load time.
 // Production (bundled): reads from dist/_pico.css (copied at build time).
@@ -187,6 +188,7 @@ function buildSidebarItems(files: string[], activePath = "", notesManager: Notes
 // ---------------------------------------------------------------------------
 
 function getFilesWithStats(files: string[], notesManager: NotesManager) {
+  const gitModifiedTimes = getGitModifiedTimes(notesManager.notesDir);
   const items: { relPath: string; mtimeMs: number; isFavorite: boolean }[] = [];
   for (const relPath of files) {
     const absPath = notesManager.resolveNotesPath(relPath);
@@ -204,7 +206,11 @@ function getFilesWithStats(files: string[], notesManager: NotesManager) {
       }
 
       const isStarFolder = relPath.startsWith("_star_/");
-      items.push({ relPath, mtimeMs: stats.mtimeMs, isFavorite: isStarFolder || hasStarTag });
+      items.push({
+        relPath,
+        mtimeMs: gitModifiedTimes.get(relPath) ?? stats.mtimeMs,
+        isFavorite: isStarFolder || hasStarTag,
+      });
     } catch {
       // Ignore unreadable files.
     }
